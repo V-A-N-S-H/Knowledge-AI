@@ -28,8 +28,6 @@ body {
 
 .bg-grid-pattern {
   background-color: #08090d;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1.2px, transparent 1.2px);
-  background-size: 22px 22px;
 }
 
 .bg-glow-radial {
