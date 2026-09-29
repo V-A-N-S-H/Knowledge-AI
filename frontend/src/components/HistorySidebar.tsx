@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Plus, MessageSquare, Trash2, Clock, BookOpen, Sun, Moon } from 'lucide-react';
+import { Plus, MessageSquare, Trash2, Clock, BookOpen } from 'lucide-react';
 import { ChatSession } from '@/lib/api';
 import { QuickActions } from './QuickActions';
 
@@ -69,20 +69,6 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
             </div>
           </div>
 
-          {onToggleTheme && (
-            <button
-              type="button"
-              onClick={onToggleTheme}
-              className={`flex h-9 w-9 items-center justify-center rounded-xl border transition-all ${
-                isLight
-                  ? 'border-slate-300 bg-white text-amber-500 shadow-sm hover:bg-slate-100'
-                  : 'border-[#263150] bg-[#161c2e] text-indigo-400 hover:bg-[#1f2740]'
-              }`}
-              title={isLight ? 'Switch to Dark Theme' : 'Switch to Light Theme'}
-            >
-              {isLight ? <Sun className="h-4.5 w-4.5 text-amber-500" /> : <Moon className="h-4.5 w-4.5 text-indigo-400" />}
-            </button>
-          )}
         </div>
 
         {/* Primary New Chat Button */}
