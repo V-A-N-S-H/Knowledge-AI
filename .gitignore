@@ -1,0 +1,32 @@
+.worktrees/
+.superpowers/
+
+# Environment files & Secrets
+.env
+.env.*
+!.env.example
+backend/.env
+frontend/.env
+frontend/.env.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+backend/venv/
+backend/.pytest_cache/
+backend/*.egg-info/
+backend/data/uploads/
+
+# Node / Next.js
+node_modules/
+frontend/node_modules/
+.next/
+frontend/.next/
+out/
+build/
+dist/
+*.log
+.DS_Store

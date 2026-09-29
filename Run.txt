@@ -1,0 +1,15 @@
+Backend: 
+
+cd "C:\Users\vansh\book-project\anaconda_projects\Personal AI Teaching Assistant\backend"
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+pip install -e ".[dev]"
+uvicorn app.main:app --reload
+
+Frontend:
+
+cd "C:\Users\vansh\book-project\anaconda_projects\Personal AI Teaching Assistant\frontend"
+npm install
+npm run dev
+
+Then Open your browser and go to http://localhost:3000 to see the frontend application running.
