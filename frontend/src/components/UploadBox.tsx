@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { UploadCloud, Sparkles, FileText, Image as ImageIcon, Video, BookOpen, FileCode } from 'lucide-react';
+import { UploadCloud, FileText, Image as ImageIcon, Video, BookOpen, FileCode } from 'lucide-react';
 import { UploadedDocument, uploadDocument } from '@/lib/api';
 import { UploadModal } from './UploadModal';
 
@@ -10,7 +10,7 @@ interface UploadBoxProps {
   theme?: 'dark' | 'light';
 }
 
-export const UploadBox: React.FC<UploadBoxProps> = ({ onDocumentUploaded, theme = 'dark' }) => {
+export const UploadBox: React.FC<UploadBoxProps> = ({ onDocumentUploaded, theme = 'light' }) => {
   const isLight = theme === 'light';
   const [isUploading, setIsUploading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -78,11 +78,11 @@ export const UploadBox: React.FC<UploadBoxProps> = ({ onDocumentUploaded, theme 
   };
 
   const mediaTypes = [
-    { label: 'PDF', icon: FileText, color: 'text-rose-500 bg-rose-50 border-rose-200 dark:bg-rose-950/40 dark:border-rose-500/30 dark:text-rose-400', accept: '.pdf' },
-    { label: 'Images', icon: ImageIcon, color: 'text-emerald-500 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/40 dark:border-emerald-500/30 dark:text-emerald-400', accept: 'image/*' },
-    { label: 'Videos', icon: Video, color: 'text-purple-500 bg-purple-50 border-purple-200 dark:bg-purple-950/40 dark:border-purple-500/30 dark:text-purple-400', accept: 'video/*' },
-    { label: 'Notes', icon: BookOpen, color: 'text-blue-500 bg-blue-50 border-blue-200 dark:bg-blue-950/40 dark:border-blue-500/30 dark:text-blue-400', accept: '.docx,.doc,.txt' },
-    { label: 'Others', icon: FileCode, color: 'text-slate-500 bg-slate-100 border-slate-200 dark:bg-slate-900 dark:border-slate-700/50 dark:text-slate-400', accept: '*' },
+    { label: 'PDF', icon: FileText, color: isLight ? 'text-[#d9534f] bg-[#e8a3a3]/30 border-[#f5c6cb]' : 'text-rose-400 bg-rose-950/40 border-rose-500/30', accept: '.pdf' },
+    { label: 'Images', icon: ImageIcon, color: isLight ? 'text-[#2e8b57] bg-[#86c59d]/30 border-[#a3e4be]' : 'text-emerald-400 bg-emerald-950/40 border-emerald-500/30', accept: 'image/*' },
+    { label: 'Videos', icon: Video, color: isLight ? 'text-[#8a2be2] bg-[#b195d9]/30 border-[#d6c7f2]' : 'text-purple-400 bg-purple-950/40 border-purple-500/30', accept: 'video/*' },
+    { label: 'Notes', icon: BookOpen, color: isLight ? 'text-[#2b6cb0] bg-[#8cb7e4]/30 border-[#b2d3f5]' : 'text-blue-400 bg-blue-950/40 border-blue-500/30', accept: '.docx,.doc,.txt' },
+    { label: 'Others', icon: FileCode, color: isLight ? 'text-white bg-[#151928] border-slate-800' : 'text-slate-300 bg-slate-900 border-slate-700', accept: '*' },
   ];
 
   return (
@@ -98,48 +98,25 @@ export const UploadBox: React.FC<UploadBoxProps> = ({ onDocumentUploaded, theme 
       />
 
       <div
-        className={`relative flex flex-col rounded-2xl border p-4 shadow-xl transition-colors duration-200 ${
+        className={`relative flex flex-col rounded-3xl border p-5 shadow-lg transition-all duration-200 ${
           isLight
-            ? 'border-slate-200 bg-white text-slate-800'
+            ? 'border-slate-200/90 bg-white text-slate-900 shadow-slate-200/40'
             : 'border-[#1a2034] bg-[#0c0e17] text-white'
         }`}
       >
-        <div className={`flex items-center justify-between border-b pb-3 mb-3 ${isLight ? 'border-slate-200' : 'border-[#181d2e]'}`}>
-          <div className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-rose-500/90 inline-block" />
-            <span className="h-2.5 w-2.5 rounded-full bg-amber-500/90 inline-block" />
-            <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/90 inline-block" />
-          </div>
-
-          <div className="flex items-center gap-1.5 text-xs font-bold tracking-wide">
-            <Sparkles className="h-3.5 w-3.5 text-indigo-500" />
-            <span className={isLight ? 'text-slate-900' : 'text-white'}>Upload Study Material</span>
-          </div>
-
-          <span
-            className={`rounded-full border px-2 py-0.5 text-[9px] font-mono font-bold ${
-              isLight
-                ? 'border-indigo-200 bg-indigo-50 text-indigo-700'
-                : 'border-indigo-500/30 bg-indigo-950 text-indigo-300'
-            }`}
-          >
-            AI Ready
-          </span>
-        </div>
-
         <div className="p-1">
-          {/* Dashed Dropzone */}
+          {/* Dashed Dropzone matching user screenshot */}
           <div
             onDragEnter={handleDrag}
             onDragOver={handleDrag}
             onDragLeave={handleDrag}
             onDrop={handleDrop}
             onClick={() => openPickerWithAccept('.pdf,image/*,video/*,.txt,.docx')}
-            className={`relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed py-8 px-4 text-center transition-all ${
+            className={`relative flex cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-dashed py-10 px-5 text-center transition-all ${
               dragActive
-                ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-md'
+                ? 'border-indigo-500 bg-indigo-50/80 text-indigo-900 shadow-md'
                 : isLight
-                ? 'border-slate-300 bg-slate-50 hover:border-indigo-400 hover:bg-indigo-50/50'
+                ? 'border-[#ccd5e6] bg-[#f8fafc] hover:border-indigo-400 hover:bg-indigo-50/40'
                 : 'border-[#232a42] bg-[#0d0f19] hover:border-indigo-500/60 hover:bg-[#111422]'
             }`}
           >
@@ -152,26 +129,26 @@ export const UploadBox: React.FC<UploadBoxProps> = ({ onDocumentUploaded, theme 
               disabled={isUploading}
             />
 
-            {/* Cloud Icon Circle */}
+            {/* Top Cloud Icon Badge */}
             <div
-              className={`mb-3 flex h-14 w-14 items-center justify-center rounded-2xl border shadow-md transition-transform group-hover:scale-105 ${
+              className={`mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border shadow-sm transition-transform hover:scale-105 ${
                 isLight
-                  ? 'border-indigo-200 bg-indigo-50 text-indigo-600'
+                  ? 'border-indigo-200/80 bg-indigo-50/90 text-indigo-600'
                   : 'border-[#263150] bg-[#151a2d] text-[#6366f1]'
               }`}
             >
-              <UploadCloud className="h-7 w-7" />
+              <UploadCloud className="h-8 w-8 text-indigo-600" />
             </div>
 
-            <h3 className={`text-sm font-bold ${isLight ? 'text-slate-900' : 'text-white'}`}>
+            <h3 className={`text-base font-extrabold tracking-tight ${isLight ? 'text-slate-900' : 'text-white'}`}>
               Upload Your File
             </h3>
-            <p className="text-xs text-slate-500 mt-1 mb-4">
+            <p className="text-xs text-slate-500 font-medium mt-1 mb-5 max-w-xs leading-relaxed">
               Drag & drop your files here, or click to browse
             </p>
 
             {/* Format Pills */}
-            <div className="flex flex-wrap items-center justify-center gap-1.5 max-w-xs">
+            <div className="flex flex-wrap items-center justify-center gap-2 max-w-xs mb-4">
               {mediaTypes.map((media, idx) => {
                 const Icon = media.icon;
                 return (
@@ -182,16 +159,16 @@ export const UploadBox: React.FC<UploadBoxProps> = ({ onDocumentUploaded, theme 
                       e.stopPropagation();
                       openPickerWithAccept(media.accept);
                     }}
-                    className={`flex items-center gap-1 rounded-xl border px-2.5 py-1 text-[11px] font-semibold transition-all hover:scale-105 ${media.color}`}
+                    className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold transition-all hover:scale-105 shadow-2xs ${media.color}`}
                   >
-                    <Icon className="h-3 w-3" />
+                    <Icon className="h-3.5 w-3.5" />
                     <span>{media.label}</span>
                   </button>
                 );
               })}
             </div>
 
-            <span className="text-[10px] text-slate-500 mt-3 font-medium">
+            <span className="text-[11px] text-slate-400 font-medium leading-relaxed max-w-xs">
               Supports PDF, Images, Videos, Audio, Text, and more
             </span>
           </div>

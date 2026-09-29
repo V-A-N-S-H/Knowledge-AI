@@ -25,7 +25,7 @@ export default function Home() {
   const [selectedDocIds, setSelectedDocIds] = useState<string[]>([]);
   const [isHealthy, setIsHealthy] = useState<boolean>(true);
   const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [theme, setTheme] = useState<'dark' | 'light'>('light');
 
   // Chat sessions state
   const [sessions, setSessions] = useState<ChatSession[]>([]);
@@ -37,6 +37,8 @@ export default function Home() {
       const savedTheme = localStorage.getItem(LOCAL_STORAGE_THEME_KEY) as 'dark' | 'light';
       if (savedTheme === 'light' || savedTheme === 'dark') {
         setTheme(savedTheme);
+      } else {
+        setTheme('light');
       }
     } catch (e) {
       console.error('Failed to load theme from localStorage', e);
