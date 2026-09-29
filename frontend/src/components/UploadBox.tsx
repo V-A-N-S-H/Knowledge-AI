@@ -97,81 +97,80 @@ export const UploadBox: React.FC<UploadBoxProps> = ({ onDocumentUploaded, theme 
         onClose={() => setModalOpen(false)}
       />
 
+      {/* Symmetrical Outer Card Container */}
       <div
-        className={`relative flex flex-col rounded-2xl border p-3.5 shadow-md transition-all duration-200 ${
+        className={`relative flex flex-col rounded-2xl border p-3 shadow-md transition-all duration-200 ${
           isLight
             ? 'border-slate-200/90 bg-white text-slate-900 shadow-slate-200/30'
             : 'border-[#1a2034] bg-[#0c0e17] text-white'
         }`}
       >
-        <div className="p-0.5">
-          {/* Slightly smaller dashed dropzone card */}
+        {/* Perfectly centered inner dashed container */}
+        <div
+          onDragEnter={handleDrag}
+          onDragOver={handleDrag}
+          onDragLeave={handleDrag}
+          onDrop={handleDrop}
+          onClick={() => openPickerWithAccept('.pdf,image/*,video/*,.txt,.docx')}
+          className={`relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed py-5 px-4 text-center transition-all ${
+            dragActive
+              ? 'border-indigo-500 bg-indigo-50/80 text-indigo-900 shadow-sm'
+              : isLight
+              ? 'border-[#ccd5e6] bg-[#f8fafc] hover:border-indigo-400 hover:bg-indigo-50/40'
+              : 'border-[#232a42] bg-[#0d0f19] hover:border-indigo-500/60 hover:bg-[#111422]'
+          }`}
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept={acceptType}
+            className="hidden"
+            onChange={(e) => handleFiles(e.target.files)}
+            disabled={isUploading}
+          />
+
+          {/* Cloud Icon Badge */}
           <div
-            onDragEnter={handleDrag}
-            onDragOver={handleDrag}
-            onDragLeave={handleDrag}
-            onDrop={handleDrop}
-            onClick={() => openPickerWithAccept('.pdf,image/*,video/*,.txt,.docx')}
-            className={`relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed py-6 px-4 text-center transition-all ${
-              dragActive
-                ? 'border-indigo-500 bg-indigo-50/80 text-indigo-900 shadow-sm'
-                : isLight
-                ? 'border-[#ccd5e6] bg-[#f8fafc] hover:border-indigo-400 hover:bg-indigo-50/40'
-                : 'border-[#232a42] bg-[#0d0f19] hover:border-indigo-500/60 hover:bg-[#111422]'
+            className={`mb-3 flex h-12 w-12 items-center justify-center rounded-xl border shadow-2xs transition-transform hover:scale-105 ${
+              isLight
+                ? 'border-indigo-200/80 bg-indigo-50/90 text-indigo-600'
+                : 'border-[#263150] bg-[#151a2d] text-[#6366f1]'
             }`}
           >
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept={acceptType}
-              className="hidden"
-              onChange={(e) => handleFiles(e.target.files)}
-              disabled={isUploading}
-            />
-
-            {/* Slightly smaller Cloud Icon Badge */}
-            <div
-              className={`mb-2.5 flex h-12 w-12 items-center justify-center rounded-xl border shadow-2xs transition-transform hover:scale-105 ${
-                isLight
-                  ? 'border-indigo-200/80 bg-indigo-50/90 text-indigo-600'
-                  : 'border-[#263150] bg-[#151a2d] text-[#6366f1]'
-              }`}
-            >
-              <UploadCloud className="h-6 w-6 text-indigo-600" />
-            </div>
-
-            <h3 className={`text-sm font-extrabold tracking-tight ${isLight ? 'text-slate-900' : 'text-white'}`}>
-              Upload Your File
-            </h3>
-            <p className="text-[11px] text-slate-500 font-medium mt-0.5 mb-3 max-w-xs leading-relaxed">
-              Drag & drop your files here, or click to browse
-            </p>
-
-            {/* Format Pills */}
-            <div className="flex flex-wrap items-center justify-center gap-1.5 max-w-xs mb-2.5">
-              {mediaTypes.map((media, idx) => {
-                const Icon = media.icon;
-                return (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openPickerWithAccept(media.accept);
-                    }}
-                    className={`flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-bold transition-all hover:scale-105 shadow-2xs ${media.color}`}
-                  >
-                    <Icon className="h-3 w-3" />
-                    <span>{media.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            <span className="text-[10px] text-slate-400 font-medium leading-relaxed max-w-xs">
-              Supports PDF, Images, Videos, Audio, Text, and more
-            </span>
+            <UploadCloud className="h-6 w-6 text-indigo-600" />
           </div>
+
+          <h3 className={`text-sm font-extrabold tracking-tight ${isLight ? 'text-slate-900' : 'text-white'}`}>
+            Upload Your File
+          </h3>
+          <p className="text-[11px] text-slate-500 font-medium mt-0.5 mb-3 max-w-xs leading-relaxed">
+            Drag & drop your files here, or click to browse
+          </p>
+
+          {/* Format Pills */}
+          <div className="flex flex-wrap items-center justify-center gap-1.5 max-w-xs mb-3">
+            {mediaTypes.map((media, idx) => {
+              const Icon = media.icon;
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openPickerWithAccept(media.accept);
+                  }}
+                  className={`flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-bold transition-all hover:scale-105 shadow-2xs ${media.color}`}
+                >
+                  <Icon className="h-3 w-3" />
+                  <span>{media.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <span className="text-[10px] text-slate-400 font-medium leading-relaxed max-w-xs pb-0.5">
+            Supports PDF, Images, Videos, Audio, Text, and more
+          </span>
         </div>
       </div>
     </>
