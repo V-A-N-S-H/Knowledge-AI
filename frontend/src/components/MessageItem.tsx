@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { User, Bot, Globe, Copy, Check, Volume2, Square, Loader2, Sparkles } from 'lucide-react';
+import { User, Bot, Globe, Copy, Check, Volume2, Square, Loader2, Sparkles, FileText } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { ChatMessage, requestTTS } from '@/lib/api';
@@ -112,6 +112,8 @@ export const MessageItem: React.FC<MessageItemProps> = ({ message, theme = 'ligh
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const isFromDocument = meta?.mode === 'document' || (meta?.sources && meta.sources.length > 0);
+
   return (
     <div className={`flex gap-3 text-sm ${isUser ? 'justify-end' : 'justify-start'}`}>
       <div
@@ -123,6 +125,22 @@ export const MessageItem: React.FC<MessageItemProps> = ({ message, theme = 'ligh
             : 'bg-[#151928] border border-slate-800 text-slate-100 rounded-tl-xs'
         }`}
       >
+        {/* File Origin Badge for AI Answers */}
+        {!isUser && (
+          <div className="flex items-center gap-1.5 mb-1">
+            {isFromDocument ? (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                <FileText className="h-3.5 w-3.5 text-emerald-500" />
+                Answered from uploaded file
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                Not in uploaded file • General AI Answer
+              </span>
+            )}
+          </div>
+        )}
         {/* Message Content */}
         {isUser ? (
           <div className="whitespace-pre-wrap leading-relaxed font-semibold text-white text-sm">
