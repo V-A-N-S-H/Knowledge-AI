@@ -123,6 +123,23 @@ export const MessageItem: React.FC<MessageItemProps> = ({ message, theme = 'ligh
             : 'bg-[#151928] border border-slate-800 text-slate-100 rounded-tl-xs'
         }`}
       >
+        {/* Clean Source Origin Label */}
+        {!isUser && (
+          <div className="flex items-center gap-1.5 mb-0.5">
+            {meta?.mode === 'document' || (meta?.sources && meta.sources.length > 0) ? (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                <FileText className="h-3.5 w-3.5 text-emerald-500" />
+                Source: Uploaded PDF
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                Source: General Knowledge (Not found in PDF)
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Message Content */}
         {isUser ? (
           <div className="whitespace-pre-wrap leading-relaxed font-semibold text-white text-sm">
