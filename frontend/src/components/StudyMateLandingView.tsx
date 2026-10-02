@@ -311,7 +311,7 @@ export function StudyMateLandingView({
                   handleSendPrompt();
                 }
               }}
-              placeholder="Ask anything or type a prompt (like Gemini or Copilot)..."
+              placeholder="Ask anything to start the chat"
               className={`w-full bg-transparent text-xs font-medium focus:outline-none resize-none ${
                 isLight
                   ? 'text-slate-800 placeholder:text-slate-400'
