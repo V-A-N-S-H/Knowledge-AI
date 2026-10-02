@@ -59,9 +59,9 @@ export function StudyMateHeader({
               <ArrowLeft className="h-4 w-4" />
             </button>
 
-            {/* Document Title Dropdown Pill */}
+            {/* Document Title Badge */}
             <div
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl border text-sm font-bold shadow-xs cursor-pointer transition-colors ${
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl border text-sm font-bold shadow-xs cursor-default transition-colors ${
                 isLight
                   ? 'border-slate-200 bg-white text-slate-900'
                   : 'border-[#1e293b] bg-[#0f172a] text-slate-100'
@@ -69,7 +69,6 @@ export function StudyMateHeader({
             >
               <FileText className="h-4 w-4 text-purple-400" />
               <span className="max-w-xs truncate">{activeDocName}</span>
-              <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
             </div>
           </div>
         )}
