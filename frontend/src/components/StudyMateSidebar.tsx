@@ -185,12 +185,12 @@ export function StudyMateSidebar({
                   !activeDocumentId && documents.length === 0
                     ? 'opacity-40 cursor-not-allowed text-slate-500'
                     : isLight
-                    ? 'text-slate-600 hover:bg-slate-200/60 hover:text-blue-600'
-                    : 'text-slate-300 hover:bg-slate-800/80 hover:text-[#38bdf8]'
+                    ? 'text-slate-600 hover:bg-slate-200/60'
+                    : 'text-slate-300 hover:bg-slate-800/80'
                 }`}
                 title={opt.prompt}
               >
-                <opt.icon className="h-4 w-4 shrink-0 text-slate-400 group-hover:text-[#38bdf8] transition-colors" />
+                <opt.icon className="h-4 w-4 shrink-0 text-slate-400 transition-colors" />
                 <span className="truncate">{opt.label}</span>
               </button>
             ))}

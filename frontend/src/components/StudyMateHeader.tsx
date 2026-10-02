@@ -61,10 +61,10 @@ export function StudyMateHeader({
 
             {/* Document Title Dropdown Pill */}
             <div
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl border text-sm font-bold shadow-sm cursor-pointer transition-colors ${
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl border text-sm font-bold shadow-xs cursor-pointer transition-colors ${
                 isLight
-                  ? 'border-slate-200 bg-white text-slate-900 hover:border-blue-400'
-                  : 'border-[#1e293b] bg-[#0f172a] text-slate-100 hover:border-[#38bdf8]'
+                  ? 'border-slate-200 bg-white text-slate-900'
+                  : 'border-[#1e293b] bg-[#0f172a] text-slate-100'
               }`}
             >
               <FileText className="h-4 w-4 text-purple-400" />
