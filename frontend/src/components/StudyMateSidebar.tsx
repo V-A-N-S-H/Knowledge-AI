@@ -105,7 +105,7 @@ export function StudyMateSidebar({
           {/* + New Chat Blue Button */}
           <button
             onClick={onNewChat}
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl bg-[#173e76] hover:bg-[#12315e] text-white font-bold text-xs shadow-md shadow-[#173e76]/30 transition-all active:scale-[0.98] cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#173e76] hover:bg-[#12315e] text-white font-bold text-xs shadow-md shadow-[#173e76]/30 transition-all active:scale-[0.98] cursor-pointer"
           >
             <Plus className="h-4 w-4 stroke-[3]" />
             <span>New Chat</span>
