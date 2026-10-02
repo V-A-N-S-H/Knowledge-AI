@@ -24,19 +24,34 @@ class ChatSessionRegistry:
             pass
 
     def get_all_sessions(self) -> Dict[str, Any]:
-        return self._load()
-
-    def get_session(self, doc_id: str) -> Dict[str, Any] | None:
         data = self._load()
-        return data.get(doc_id)
+        # If data is un-scoped dict, return flat dict
+        return data
 
-    def save_session(self, doc_id: str, session_data: Dict[str, Any]) -> None:
+    def get_user_sessions(self, user_id: str) -> Dict[str, Any]:
         data = self._load()
-        data[doc_id] = session_data
+        if user_id in data and isinstance(data[user_id], dict):
+            return data[user_id]
+        # Fallback for un-scoped format
+        return {k: v for k, v in data.items() if not isinstance(v, dict) or "messages" in v}
+
+    def get_session(self, user_id: str, doc_id: str) -> Dict[str, Any] | None:
+        user_sessions = self.get_user_sessions(user_id)
+        return user_sessions.get(doc_id)
+
+    def save_session(self, user_id: str, doc_id: str, session_data: Dict[str, Any]) -> None:
+        data = self._load()
+        if user_id not in data or not isinstance(data[user_id], dict):
+            data[user_id] = {}
+        data[user_id][doc_id] = session_data
         self._save(data)
 
-    def delete_session(self, doc_id: str) -> bool:
+    def delete_session(self, user_id: str, doc_id: str) -> bool:
         data = self._load()
+        if user_id in data and isinstance(data[user_id], dict) and doc_id in data[user_id]:
+            del data[user_id][doc_id]
+            self._save(data)
+            return True
         if doc_id in data:
             del data[doc_id]
             self._save(data)

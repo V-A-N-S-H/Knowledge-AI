@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Header, HTTPException, Query, UploadFile
 from app.core.dependencies import get_document_service
 from app.schemas.documents import UploadResponse
 from app.services.documents import DocumentService
@@ -9,21 +9,28 @@ router = APIRouter(prefix="/documents", tags=["Documents"])
 @router.post("/upload", response_model=UploadResponse)
 async def upload_document(
     file: UploadFile = File(...),
+    x_user_id: str | None = Header(default=None, alias="X-User-Id"),
+    user_id: str | None = Query(default=None),
     doc_service: DocumentService = Depends(get_document_service)
 ) -> UploadResponse:
+    target_user_id = x_user_id or user_id or "dev_user_001"
     content = await file.read()
     return doc_service.ingest_pdf(
         filename=file.filename or "uploaded.pdf",
         content_type=file.content_type,
-        content=content
+        content=content,
+        user_id=target_user_id
     )
 
 
 @router.get("", response_model=list[UploadResponse])
 async def list_documents(
+    x_user_id: str | None = Header(default=None, alias="X-User-Id"),
+    user_id: str | None = Query(default=None),
     doc_service: DocumentService = Depends(get_document_service)
 ) -> list[UploadResponse]:
-    return doc_service.list_documents()
+    target_user_id = x_user_id or user_id or "dev_user_001"
+    return doc_service.list_documents(user_id=target_user_id)
 
 
 def _create_fallback_pdf(title: str) -> bytes:

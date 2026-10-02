@@ -59,9 +59,18 @@ export function getDocumentFileUrl(documentId: string): string {
   return `${API_BASE_URL}/documents/${documentId}/file`;
 }
 
-export async function fetchUploadedDocuments(): Promise<UploadedDocument[]> {
+export function getAuthHeaders(userId?: string): HeadersInit {
+  const headers: Record<string, string> = {};
+  if (userId) {
+    headers['X-User-Id'] = userId;
+  }
+  return headers;
+}
+
+export async function fetchUploadedDocuments(userId?: string): Promise<UploadedDocument[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}/documents`, { method: 'GET' });
+    const headers = getAuthHeaders(userId);
+    const res = await fetch(`${API_BASE_URL}/documents`, { method: 'GET', headers });
     if (!res.ok) return [];
     const docs: UploadedDocument[] = await res.json();
     return docs.map((d) => ({
@@ -74,9 +83,10 @@ export async function fetchUploadedDocuments(): Promise<UploadedDocument[]> {
   }
 }
 
-export async function fetchChatSessionsApi(): Promise<{ [docId: string]: ChatSession }> {
+export async function fetchChatSessionsApi(userId?: string): Promise<{ [docId: string]: ChatSession }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/chat/sessions`, { method: 'GET' });
+    const headers = getAuthHeaders(userId);
+    const res = await fetch(`${API_BASE_URL}/chat/sessions`, { method: 'GET', headers });
     if (!res.ok) return {};
     return await res.json();
   } catch (error) {
@@ -85,11 +95,12 @@ export async function fetchChatSessionsApi(): Promise<{ [docId: string]: ChatSes
   }
 }
 
-export async function saveChatSessionApi(docId: string, session: ChatSession): Promise<boolean> {
+export async function saveChatSessionApi(docId: string, session: ChatSession, userId?: string): Promise<boolean> {
   try {
+    const headers = { 'Content-Type': 'application/json', ...getAuthHeaders(userId) };
     const res = await fetch(`${API_BASE_URL}/chat/sessions/${docId}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify(session),
     });
     return res.ok;
@@ -99,10 +110,12 @@ export async function saveChatSessionApi(docId: string, session: ChatSession): P
   }
 }
 
-export async function deleteChatSessionApi(docId: string): Promise<boolean> {
+export async function deleteChatSessionApi(docId: string, userId?: string): Promise<boolean> {
   try {
+    const headers = getAuthHeaders(userId);
     const res = await fetch(`${API_BASE_URL}/chat/sessions/${docId}`, {
       method: 'DELETE',
+      headers,
     });
     return res.ok;
   } catch (error) {
@@ -111,12 +124,14 @@ export async function deleteChatSessionApi(docId: string): Promise<boolean> {
   }
 }
 
-export async function deleteUploadedDocumentApi(documentId: string): Promise<boolean> {
+export async function deleteUploadedDocumentApi(documentId: string, userId?: string): Promise<boolean> {
   try {
+    const headers = getAuthHeaders(userId);
     const res = await fetch(`${API_BASE_URL}/documents/${documentId}`, {
       method: 'DELETE',
+      headers,
     });
-    deleteChatSessionApi(documentId);
+    deleteChatSessionApi(documentId, userId);
     return res.ok;
   } catch (error) {
     console.error('Failed to delete document from server:', error);
@@ -124,12 +139,14 @@ export async function deleteUploadedDocumentApi(documentId: string): Promise<boo
   }
 }
 
-export async function uploadDocument(file: File): Promise<UploadedDocument> {
+export async function uploadDocument(file: File, userId?: string): Promise<UploadedDocument> {
   const formData = new FormData();
   formData.append('file', file);
+  const headers = getAuthHeaders(userId);
 
   const res = await fetch(`${API_BASE_URL}/documents/upload`, {
     method: 'POST',
+    headers,
     body: formData,
   });
 

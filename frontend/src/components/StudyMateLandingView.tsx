@@ -35,6 +35,7 @@ interface StudyMateLandingViewProps {
   onStartChat?: (initialPrompt: string) => void;
   documents: UploadedDocument[];
   theme?: 'dark' | 'light';
+  userId?: string;
 }
 
 export function StudyMateLandingView({
@@ -44,6 +45,7 @@ export function StudyMateLandingView({
   onStartChat,
   documents,
   theme = 'dark',
+  userId,
 }: StudyMateLandingViewProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -128,7 +130,7 @@ export function StudyMateLandingView({
     setError(null);
     setIsUploading(true);
     try {
-      const uploaded = await uploadDocument(file);
+      const uploaded = await uploadDocument(file, userId);
       const localBlobUrl = URL.createObjectURL(file);
       onDocumentUploaded({
         ...uploaded,

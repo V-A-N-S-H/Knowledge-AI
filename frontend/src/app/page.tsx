@@ -42,9 +42,14 @@ export default function Home() {
   const [sessions, setSessions] = useState<{ [docId: string]: ChatSession }>({});
   const [pendingQuickPrompt, setPendingQuickPrompt] = useState<string | null>(null);
 
-  // Initial Mount
+  // Dynamic user data keys
+  const userId = user?.user_id || 'guest_user';
+  const docsStorageKey = `studymate_docs_${userId}`;
+  const sessionsStorageKey = `studymate_sessions_${userId}`;
+  const activeDocStorageKey = `studymate_active_doc_${userId}`;
+
+  // Load theme on initial mount
   useEffect(() => {
-    // Theme
     try {
       const savedTheme = localStorage.getItem(LOCAL_STORAGE_THEME_KEY) as 'light' | 'dark';
       if (savedTheme === 'light' || savedTheme === 'dark') {
@@ -56,7 +61,6 @@ export default function Home() {
       console.error('Failed to load theme', e);
     }
 
-    // User Session
     try {
       const savedUser = localStorage.getItem(LOCAL_STORAGE_USER_KEY);
       if (savedUser) {
@@ -65,39 +69,44 @@ export default function Home() {
     } catch (e) {
       console.error('Failed to load user session', e);
     }
+  }, []);
 
-    // Load Chat Sessions from localStorage first
+  // Sync / Load user-scoped data when user account changes
+  useEffect(() => {
+    const activeUserId = user?.user_id || 'guest_user';
+
+    // 1. Load Chat Sessions from localStorage first
     let localSessions: { [docId: string]: ChatSession } = {};
     try {
-      const savedSessions = localStorage.getItem(LOCAL_STORAGE_SESSIONS_KEY);
+      const savedSessions = localStorage.getItem(`studymate_sessions_${activeUserId}`);
       if (savedSessions) {
         localSessions = JSON.parse(savedSessions);
-        setSessions(localSessions);
       }
     } catch (e) {
       console.error('Failed to load local sessions', e);
     }
+    setSessions(localSessions);
 
     // Fetch Chat Sessions from backend & merge
-    fetchChatSessionsApi().then((backendSessions) => {
+    fetchChatSessionsApi(activeUserId).then((backendSessions) => {
       if (Object.keys(backendSessions).length > 0) {
         const mergedSessions = { ...localSessions, ...backendSessions };
         setSessions(mergedSessions);
         try {
-          localStorage.setItem(LOCAL_STORAGE_SESSIONS_KEY, JSON.stringify(mergedSessions));
+          localStorage.setItem(`studymate_sessions_${activeUserId}`, JSON.stringify(mergedSessions));
         } catch (e) {}
       }
     });
 
-    // Fetch documents from backend & merge with localStorage
-    fetchUploadedDocuments().then((backendDocs) => {
+    // 2. Fetch documents from backend & merge with localStorage
+    fetchUploadedDocuments(activeUserId).then((backendDocs) => {
       let merged: UploadedDocument[] = backendDocs.map((d) => ({
         ...d,
         fileUrl: d.fileUrl || getDocumentFileUrl(d.document_id),
       }));
 
       try {
-        const savedDocs = localStorage.getItem(LOCAL_STORAGE_DOCS_KEY);
+        const savedDocs = localStorage.getItem(`studymate_docs_${activeUserId}`);
         if (savedDocs) {
           const parsedLocal: UploadedDocument[] = JSON.parse(savedDocs);
           parsedLocal.forEach((localDoc) => {
@@ -115,40 +124,46 @@ export default function Home() {
 
       setDocuments(merged);
 
-      // Restore active document after page refresh if available
+      // Restore active document for this specific user if available
       try {
-        const savedActiveDocId = localStorage.getItem(LOCAL_STORAGE_ACTIVE_DOC_KEY);
+        const savedActiveDocId = localStorage.getItem(`studymate_active_doc_${activeUserId}`);
         if (savedActiveDocId) {
           const active = merged.find((d) => d.document_id === savedActiveDocId);
           if (active) {
             setActiveDocument(active);
+          } else {
+            setActiveDocument(null);
           }
+        } else {
+          setActiveDocument(null);
         }
-      } catch (e) {}
+      } catch (e) {
+        setActiveDocument(null);
+      }
     });
-  }, []);
+  }, [user?.user_id]);
 
-  // Sync documents to localStorage
+  // Sync documents to localStorage for active user
   useEffect(() => {
-    if (documents.length > 0) {
+    if (documents.length >= 0) {
       try {
-        localStorage.setItem(LOCAL_STORAGE_DOCS_KEY, JSON.stringify(documents));
+        localStorage.setItem(docsStorageKey, JSON.stringify(documents));
       } catch (e) {
         console.error('Failed to save documents', e);
       }
     }
-  }, [documents]);
+  }, [documents, docsStorageKey]);
 
-  // Sync sessions to localStorage
+  // Sync sessions to localStorage for active user
   useEffect(() => {
-    if (Object.keys(sessions).length > 0) {
+    if (Object.keys(sessions).length >= 0) {
       try {
-        localStorage.setItem(LOCAL_STORAGE_SESSIONS_KEY, JSON.stringify(sessions));
+        localStorage.setItem(sessionsStorageKey, JSON.stringify(sessions));
       } catch (e) {
         console.error('Failed to save sessions', e);
       }
     }
-  }, [sessions]);
+  }, [sessions, sessionsStorageKey]);
 
   // Handlers
   const handleToggleTheme = () => {
@@ -163,6 +178,8 @@ export default function Home() {
 
   const handleAuthSuccess = (loggedUser: User) => {
     setUser(loggedUser);
+    setActiveDocument(null);
+    setIsGeneralChatOpen(false);
     try {
       localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(loggedUser));
     } catch (e) {
@@ -172,6 +189,8 @@ export default function Home() {
 
   const handleLogout = () => {
     setUser(null);
+    setActiveDocument(null);
+    setIsGeneralChatOpen(false);
     localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
   };
 
@@ -203,7 +222,7 @@ export default function Home() {
   const handleDeleteDocument = async (docId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     try {
-      await deleteUploadedDocumentApi(docId);
+      await deleteUploadedDocumentApi(docId, userId);
     } catch (err) {
       console.error('Failed to delete document from backend', err);
     }
@@ -219,7 +238,7 @@ export default function Home() {
       setActiveDocument(null);
       setIsGeneralChatOpen(false);
       try {
-        localStorage.removeItem(LOCAL_STORAGE_ACTIVE_DOC_KEY);
+        localStorage.removeItem(activeDocStorageKey);
       } catch (e) {}
     }
   };
@@ -228,7 +247,7 @@ export default function Home() {
     setActiveDocument(null);
     setIsGeneralChatOpen(false);
     try {
-      localStorage.removeItem(LOCAL_STORAGE_ACTIVE_DOC_KEY);
+      localStorage.removeItem(activeDocStorageKey);
     } catch (e) {}
   };
 
@@ -263,7 +282,7 @@ export default function Home() {
     }));
 
     if (currentDocId !== 'global') {
-      saveChatSessionApi(currentDocId, updatedSession);
+      saveChatSessionApi(currentDocId, updatedSession, userId);
     }
   };
 
@@ -313,6 +332,7 @@ export default function Home() {
               onStartChat={handleStartGeneralChat}
               documents={documents}
               theme={theme}
+              userId={userId}
             />
           ) : (
             <StudyMateDocumentWorkspace

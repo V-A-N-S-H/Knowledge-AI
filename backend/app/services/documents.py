@@ -84,8 +84,10 @@ class DocumentService:
         self,
         filename: str,
         content_type: str | None,
-        content: bytes
+        content: bytes,
+        user_id: str | None = None
     ) -> UploadResponse:
+        owner = user_id or self.owner_id
         # 1. Validate file
         validate_pdf(filename, content_type, content, self.max_upload_bytes)
 
@@ -108,7 +110,7 @@ class DocumentService:
                 page=c.page,
                 chunk_id=f"{document_id}_{c.chunk_id}",
                 file_type=c.file_type,
-                user_id=self.owner_id,
+                user_id=owner,
                 document_id=document_id
             )
             for c in chunks
@@ -132,12 +134,13 @@ class DocumentService:
         )
 
         # 9. Register document metadata
-        self.registry.register(response, self.owner_id)
+        self.registry.register(response, owner)
 
         return response
 
-    def list_documents(self) -> list[UploadResponse]:
-        return self.registry.list_all(self.owner_id)
+    def list_documents(self, user_id: str | None = None) -> list[UploadResponse]:
+        owner = user_id or self.owner_id
+        return self.registry.list_all(owner)
 
     def get_document_file(self, document_id: str) -> tuple[bytes, str] | None:
         # 1. Try direct disk storage lookup first by document_id
