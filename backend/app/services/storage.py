@@ -48,9 +48,20 @@ class LocalFileStorage:
             raise AppError(status_code=500, public_message=f"Failed to save uploaded PDF file locally: {str(e)}")
 
     def get_pdf(self, document_id: str, filename: str) -> bytes | None:
-        file_path = self.upload_dir / document_id / filename
-        if file_path.exists():
-            return file_path.read_bytes()
+        doc_dir = self.upload_dir / document_id
+        if doc_dir.exists():
+            if filename:
+                exact_path = doc_dir / filename
+                if exact_path.exists():
+                    return exact_path.read_bytes()
+            for f in doc_dir.iterdir():
+                if f.is_file() and (f.suffix.lower() in [".pdf", ".doc", ".docx"] or f.name == filename):
+                    return f.read_bytes()
+
+        if self.upload_dir.exists():
+            for f in self.upload_dir.rglob("*.pdf"):
+                if f.name == filename or document_id in f.name or document_id in str(f):
+                    return f.read_bytes()
         return None
 
     def delete_pdf(self, document_id: str, filename: str) -> None:

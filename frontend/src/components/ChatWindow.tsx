@@ -1,13 +1,27 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, Loader2, Trash2, HelpCircle } from 'lucide-react';
+import {
+  ArrowUp,
+  Sparkles,
+  Loader2,
+  Trash2,
+  HelpCircle,
+  Mic,
+  MicOff,
+  Volume2,
+  Plus,
+  BookOpen,
+  Presentation,
+  Check,
+} from 'lucide-react';
 import { ChatMessage, sendChatMessage } from '@/lib/api';
 import { MessageItem } from './MessageItem';
 
 interface ChatWindowProps {
   messages: ChatMessage[];
   selectedDocIds: string[];
+  docName?: string;
   onMessagesChange: (newMessages: ChatMessage[]) => void;
   onClearCurrentChat: () => void;
   pendingPrompt?: string | null;
@@ -18,16 +32,62 @@ interface ChatWindowProps {
 export const ChatWindow: React.FC<ChatWindowProps> = ({
   messages,
   selectedDocIds,
+  docName = 'this document',
   onMessagesChange,
   onClearCurrentChat,
   pendingPrompt,
   onClearPendingPrompt,
-  theme = 'dark',
+  theme = 'light',
 }) => {
   const isLight = theme === 'light';
   const [input, setInput] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [autoSpeak, setAutoSpeak] = useState(false);
+  const [mode, setMode] = useState<'fast' | 'quality'>('fast');
+  const recognitionRef = useRef<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const toggleListening = () => {
+    if (isListening) {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+      setIsListening(false);
+      return;
+    }
+
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert('Speech recognition is not supported in this browser.');
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => setIsListening(true);
+      recognition.onresult = (event: any) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        setInput(transcript);
+      };
+      recognition.onerror = () => setIsListening(false);
+      recognition.onend = () => setIsListening(false);
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch (e) {
+      setIsListening(false);
+    }
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -82,11 +142,11 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         sender: 'assistant',
-        content: `Error: ${err.message || 'Failed to get answer from server.'}`,
+        content: `Error: ${err.message || 'Failed to get response.'}`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         responseMeta: {
           mode: 'fallback',
-          notice: 'System Error',
+          notice: 'Error',
           sources: [],
         },
       };
@@ -96,111 +156,136 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     }
   };
 
-  const suggestions = [
-    'What key facts or metrics are mentioned in the uploaded document?',
-    'Summarize the main points in 3 bullet points.',
-    'Explain this concept in simple terms.',
+  const promptSuggestions = [
+    `✨ Summarize ${docName}`,
+    `How does ${docName} handle key concepts?`,
+    `What are the most useful methods or findings mentioned in ${docName}?`,
   ];
 
   return (
     <div
-      className={`flex flex-1 flex-col rounded-2xl border backdrop-blur-md overflow-hidden h-full min-h-[500px] shadow-2xl transition-colors duration-200 ${
-        isLight
-          ? 'border-slate-200 bg-white text-slate-900'
-          : 'border-[#1a2034] bg-[#090a0f] text-white'
+      className={`flex flex-col h-full w-full overflow-hidden transition-colors ${
+        isLight ? 'bg-white text-slate-900' : 'bg-[#0f121d] text-slate-100'
       }`}
     >
-      {/* Top Bar */}
+      {/* Top Controls Header */}
       <div
-        className={`flex items-center justify-between border-b px-6 py-4 ${
-          isLight ? 'border-slate-200 bg-slate-50' : 'border-[#181d2e] bg-[#0d0e14]'
+        className={`flex items-center justify-between border-b px-4 py-2.5 text-xs font-semibold ${
+          isLight ? 'bg-white border-slate-200' : 'bg-[#151928] border-slate-800'
         }`}
       >
-        <div className="flex items-center gap-2.5">
-          <Sparkles className="h-5 w-5 text-indigo-500" />
-          <h2 className={`text-base font-extrabold ${isLight ? 'text-slate-900' : 'text-white'}`}>
-            AI Query Assistant
-          </h2>
+        <div className="flex items-center gap-2">
+          <Sparkles className="h-4 w-4 text-purple-600" />
+          <span className="font-bold">AI Chat</span>
         </div>
-        {messages.length > 0 && (
+
+        <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={onClearCurrentChat}
-            className={`flex items-center gap-2 rounded-xl border px-3.5 py-1.5 text-xs font-bold transition-colors ${
-              isLight
-                ? 'border-slate-300 bg-white text-slate-700 hover:text-rose-600 hover:border-rose-300'
-                : 'border-[#263150] bg-[#08090d] text-slate-300 hover:text-rose-400 hover:border-rose-500/30'
+            onClick={() => setAutoSpeak(!autoSpeak)}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-bold transition-all ${
+              autoSpeak
+                ? 'border-purple-500 bg-purple-50 text-purple-600'
+                : 'border-slate-200 dark:border-slate-800 hover:border-purple-300'
             }`}
           >
-            <Trash2 className="h-4 w-4" />
-            Clear Current Chat
+            <Volume2 className="h-3.5 w-3.5 text-purple-600" />
+            <span>Voice: {autoSpeak ? 'ON' : 'OFF'}</span>
           </button>
-        )}
+
+          {messages.length > 0 && (
+            <button
+              type="button"
+              onClick={onClearCurrentChat}
+              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-rose-50 text-slate-500 hover:text-rose-600 transition-colors"
+              title="Clear Chat"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Messages Stream */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-5 scrollbar-thin">
+      {/* Messages Scroll Area */}
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
         {messages.length === 0 ? (
-          <div className="flex h-full flex-col items-center justify-center text-center p-6">
-            <div
-              className={`flex h-14 w-14 items-center justify-center rounded-2xl border mb-4 shadow-md ${
-                isLight
-                  ? 'border-indigo-200 bg-indigo-50 text-indigo-600'
-                  : 'border-[#263150] bg-[#151a2d] text-indigo-400'
-              }`}
-            >
-              <HelpCircle className="h-7 w-7" />
+          <div className="space-y-4">
+            {/* ChatPDF Initial Welcome Message Bubble */}
+            <div className="flex items-start gap-3">
+              <div
+                className={`p-4 rounded-2xl max-w-xl text-sm font-medium leading-relaxed border shadow-sm ${
+                  isLight
+                    ? 'bg-slate-50 border-slate-200/90 text-slate-800'
+                    : 'bg-[#181d2e] border-slate-800 text-slate-200'
+                }`}
+              >
+                <p className="font-bold text-base mb-1">
+                  Hey there, ready to chat about {docName}?
+                </p>
+                <p className="text-slate-500 dark:text-slate-400 mb-3">
+                  I've indexed your file completely. Ask any questions, summarize key pages, or extract citations instantly!
+                </p>
+              </div>
             </div>
-            <h3 className={`text-lg font-extrabold ${isLight ? 'text-slate-900' : 'text-white'}`}>
-              Ask any question about your data
-            </h3>
-            <p className="text-sm text-slate-500 max-w-lg mt-1.5 mb-6 font-medium leading-relaxed">
-              KnowledgeAI first searches your uploaded PDFs. If answered, it returns document evidence with page numbers. If not, it safely falls back to general LLM knowledge.
-            </p>
 
-            {/* Suggestions */}
-            <div className="flex flex-col gap-2.5 w-full max-w-lg">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                Try asking:
-              </span>
-              {suggestions.map((s, idx) => (
+            {/* Quick Prompt Pills (ChatPDF Image 2 Style) */}
+            <div className="pl-11 space-y-2.5 max-w-xl">
+              <div className="flex flex-wrap gap-2">
+                {promptSuggestions.map((prompt, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => handleSend(prompt)}
+                    className="px-3.5 py-2 rounded-2xl border border-purple-200 dark:border-purple-800/80 bg-purple-50/50 dark:bg-purple-950/30 hover:bg-purple-100 dark:hover:bg-purple-900/50 text-purple-700 dark:text-purple-300 text-xs font-semibold transition-all shadow-sm text-left"
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+
+              {/* Action Buttons: Flashcards & Slides */}
+              <div className="flex items-center gap-2 pt-2">
+                <span className="text-xs text-slate-400 font-bold">Create:</span>
                 <button
-                  key={idx}
-                  onClick={() => handleSend(s)}
-                  className={`rounded-xl border p-3.5 text-left text-sm font-medium transition-all shadow-sm ${
-                    isLight
-                      ? 'border-slate-200 bg-slate-50 text-slate-800 hover:border-indigo-300 hover:bg-indigo-50/60'
-                      : 'border-[#1f273e] bg-[#0e1017] text-slate-200 hover:border-indigo-500/40 hover:bg-[#14192b]'
-                  }`}
+                  onClick={() => handleSend(`Create study flashcards from ${docName}`)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-purple-400 text-xs font-bold transition-all"
                 >
-                  "{s}"
+                  <BookOpen className="h-3.5 w-3.5 text-indigo-500" />
+                  <span>Flashcards</span>
                 </button>
-              ))}
+                <button
+                  onClick={() => handleSend(`Generate presentation slides summary from ${docName}`)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-purple-400 text-xs font-bold transition-all"
+                >
+                  <Presentation className="h-3.5 w-3.5 text-rose-500" />
+                  <span>Slides</span>
+                </button>
+              </div>
             </div>
           </div>
         ) : (
-          messages.map((msg) => <MessageItem key={msg.id} message={msg} theme={theme} />)
+          messages.map((msg, idx) => (
+            <MessageItem
+              key={msg.id}
+              message={msg}
+              theme={theme}
+              autoSpeak={autoSpeak && idx === messages.length - 1}
+            />
+          ))
         )}
 
         {isGenerating && (
-          <div
-            className={`flex items-center gap-3 text-sm font-semibold p-3.5 rounded-xl w-fit shadow-md border ${
-              isLight
-                ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
-                : 'bg-indigo-950/40 border-indigo-500/40 text-indigo-300'
-            }`}
-          >
-            <Loader2 className="h-4.5 w-4.5 animate-spin text-indigo-500" />
-            <span>Analyzing documents & generating grounded response...</span>
+          <div className="flex items-center gap-2 text-xs font-bold text-purple-600 dark:text-purple-400 p-3 rounded-xl bg-purple-50 dark:bg-purple-950/40 w-fit">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span>ChatPDF AI is reading and analyzing your PDF...</span>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Bar */}
+      {/* Chat Input Container */}
       <div
-        className={`border-t p-4 ${
-          isLight ? 'border-slate-200 bg-slate-50' : 'border-[#181d2e] bg-[#0d0e14]'
+        className={`border-t p-3 sm:p-4 ${
+          isLight ? 'bg-white border-slate-200' : 'bg-[#151928] border-slate-800'
         }`}
       >
         <form
@@ -208,31 +293,72 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             e.preventDefault();
             handleSend();
           }}
-          className="flex items-center gap-3"
+          className={`flex flex-col gap-2 p-2.5 rounded-2xl border transition-all ${
+            isLight
+              ? 'bg-slate-50 border-slate-200 focus-within:border-purple-400 focus-within:bg-white'
+              : 'bg-slate-900 border-slate-800 focus-within:border-purple-500'
+          }`}
         >
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={
-              selectedDocIds.length > 0
-                ? "Ask a question about selected documents..."
-                : "Ask anything (no documents selected)..."
-            }
+            placeholder="Ask any question..."
             disabled={isGenerating}
-            className={`flex-1 rounded-xl border px-4 py-3.5 text-base placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 ${
-              isLight
-                ? 'border-slate-300 bg-white text-slate-900'
-                : 'border-[#1e243a] bg-[#0c0e18] text-white'
-            }`}
+            className="w-full bg-transparent px-2 py-1 text-sm focus:outline-none text-slate-800 dark:text-slate-100 placeholder:text-slate-400"
           />
-          <button
-            type="submit"
-            disabled={!input.trim() || isGenerating}
-            className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#4f6ef7] text-white hover:bg-[#4360e6] disabled:opacity-40 transition-all shadow-md"
-          >
-            <Send className="h-5 w-5" />
-          </button>
+
+          <div className="flex items-center justify-between pt-1">
+            {/* Mode Switches: Fast / Quality */}
+            <div className="flex items-center gap-1.5">
+              <div className="flex items-center bg-slate-200/70 dark:bg-slate-800 p-0.5 rounded-lg text-[11px] font-bold">
+                <button
+                  type="button"
+                  onClick={() => setMode('fast')}
+                  className={`px-2 py-0.5 rounded-md transition-all ${
+                    mode === 'fast'
+                      ? 'bg-white dark:bg-purple-600 text-purple-700 dark:text-white shadow-sm'
+                      : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                  }`}
+                >
+                  Fast
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMode('quality')}
+                  className={`px-2 py-0.5 rounded-md transition-all ${
+                    mode === 'quality'
+                      ? 'bg-purple-600 text-white shadow-sm'
+                      : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                  }`}
+                >
+                  Quality
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={toggleListening}
+                className={`p-1.5 rounded-lg border transition-colors ${
+                  isListening
+                    ? 'border-rose-500 bg-rose-600 text-white animate-pulse'
+                    : 'border-slate-200 dark:border-slate-800 text-slate-400 hover:text-purple-600'
+                }`}
+                title="Voice input"
+              >
+                {isListening ? <MicOff className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5" />}
+              </button>
+            </div>
+
+            {/* Send Button */}
+            <button
+              type="submit"
+              disabled={!input.trim() || isGenerating}
+              className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-40 transition-all shadow-md shadow-purple-600/30"
+            >
+              <ArrowUp className="h-4 w-4" />
+            </button>
+          </div>
         </form>
       </div>
     </div>

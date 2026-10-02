@@ -19,6 +19,8 @@ backend/venv/
 backend/.pytest_cache/
 backend/*.egg-info/
 backend/data/uploads/
+backend/data/*.json
+data/
 
 # Node / Next.js
 node_modules/

@@ -29,7 +29,7 @@ export const UploadDropzone: React.FC<UploadDropzoneProps> = ({
 
   const formatChips = [
     { label: 'PDF', icon: FileText, color: 'bg-rose-950/80 text-rose-400 border-rose-500/30' },
-    { label: 'Images', icon: ImageIcon, color: 'bg-blue-950/80 text-blue-400 border-blue-500/30' },
+    { label: 'Images', icon: ImageIcon, color: 'bg-[#173e76]/20 text-[#173e76] border-[#173e76]/40' },
     { label: 'Videos', icon: Video, color: 'bg-purple-950/80 text-purple-400 border-purple-500/30' },
     { label: 'Docs', icon: FileCode, color: 'bg-indigo-950/80 text-indigo-400 border-indigo-500/30' },
     { label: 'PPT', icon: Presentation, color: 'bg-orange-950/80 text-orange-400 border-orange-500/30' },
@@ -147,7 +147,7 @@ export const UploadDropzone: React.FC<UploadDropzoneProps> = ({
         </div>
 
         <div className="flex items-start gap-3 rounded-2xl border border-[#1e2336] bg-[#0d0f17] p-4">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-950 border border-blue-500/30 text-blue-400">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#173e76]/20 border border-[#173e76]/40 text-[#173e76]">
             <Globe className="h-5 w-5" />
           </div>
           <div>

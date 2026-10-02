@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     supabase_key: str = ""
     supabase_storage_bucket: str = "documents"
 
+    gpt_sovits_url: str = "http://localhost:9880"
+    gpt_sovits_text_language: str = "auto"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

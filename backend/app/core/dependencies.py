@@ -7,6 +7,8 @@ from app.services.qdrant import VectorStore, FakeVectorStore, QdrantVectorStore
 from app.services.rag import RagService
 from app.services.retrieval import RetrievalService
 from app.services.storage import FileStorage, FakeFileStorage, LocalFileStorage, SupabaseFileStorage
+from app.services.tts import TTSService, FakeTTSService, GptSovitsTTSService
+
 
 _fake_vector_store = FakeVectorStore()
 _fake_file_storage = FakeFileStorage()
@@ -105,3 +107,14 @@ def get_rag_service() -> RagService:
         answerability_service=get_answerability_service(),
         generation_service=get_generation_service()
     )
+
+
+def get_tts_service() -> TTSService:
+    settings = get_settings()
+    if settings.environment == "test":
+        return FakeTTSService()
+    return GptSovitsTTSService(
+        base_url=settings.gpt_sovits_url,
+        default_language=settings.gpt_sovits_text_language
+    )
+

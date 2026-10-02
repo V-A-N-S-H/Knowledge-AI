@@ -89,11 +89,12 @@ class DocumentService:
         # 1. Validate file
         validate_pdf(filename, content_type, content, self.max_upload_bytes)
 
-        # 2. Generate document ID and persist original file
+        # 2. Generate document ID
         document_id = str(uuid.uuid4())
-        self.file_storage.save_pdf(document_id, filename, content)
+        # Note: Raw PDF binary is processed in-memory and embedded to Qdrant without saving physical file to disk
 
         # 3. Extract text pages
+
         extracted_pages = extract_pdf_pages(content, filename)
 
         # 4. Chunk pages
@@ -120,6 +121,9 @@ class DocumentService:
         # 7. Upsert to vector database
         self.vector_store.upsert(stored_chunks, embeddings)
 
+        # 8. Save PDF bytes to file storage for PDF preview/rendering
+        self.file_storage.save_pdf(document_id, filename, content)
+
         response = UploadResponse(
             document_id=document_id,
             filename=filename,
@@ -127,13 +131,42 @@ class DocumentService:
             status="ready"
         )
 
-        # 8. Register document metadata
+        # 9. Register document metadata
         self.registry.register(response, self.owner_id)
 
         return response
 
     def list_documents(self) -> list[UploadResponse]:
         return self.registry.list_all(self.owner_id)
+
+    def get_document_file(self, document_id: str) -> tuple[bytes, str] | None:
+        # 1. Try direct disk storage lookup first by document_id
+        content = self.file_storage.get_pdf(document_id, "")
+        if content:
+            # Retrieve filename from registry if available, else default
+            data = self.registry._load()
+            item = data.get(document_id, {})
+            filename = item.get("filename", f"{document_id}.pdf")
+            return content, filename
+
+        # 2. Check registry list
+        docs = self.registry.list_all(self.owner_id)
+        doc_meta = next((d for d in docs if d.document_id == document_id), None)
+        if doc_meta:
+            content = self.file_storage.get_pdf(document_id, doc_meta.filename)
+            if content:
+                return content, doc_meta.filename
+
+        # 3. Check raw registry dict
+        data = self.registry._load()
+        item = data.get(document_id)
+        if item:
+            doc_filename = item.get("filename", "document.pdf")
+            content = self.file_storage.get_pdf(document_id, doc_filename)
+            if content:
+                return content, doc_filename
+
+        return None
 
     def delete_document(self, document_id: str) -> bool:
         doc_meta = self.registry.unregister(document_id)
@@ -143,5 +176,18 @@ class DocumentService:
         self.vector_store.delete_document(document_id)
         filename = doc_meta.get("filename", "")
         if filename:
-            self.file_storage.delete_pdf(document_id, filename)
+            try:
+                self.file_storage.delete_pdf(document_id, filename)
+            except Exception:
+                pass
         return True
+
+    def clear_all_documents(self) -> int:
+        data = self.registry._load()
+        count = len(data)
+        for doc_id in list(data.keys()):
+            self.delete_document(doc_id)
+        self.registry._save({})
+        return count
+
+

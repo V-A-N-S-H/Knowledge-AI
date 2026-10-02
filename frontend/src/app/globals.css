@@ -20,36 +20,54 @@
 }
 
 body {
-  background-color: #08090d;
+  background-color: #060911;
   color: #ededed;
   font-family: var(--font-sans), system-ui, sans-serif;
   min-height: 100vh;
 }
 
+input, textarea {
+  caret-color: #38bdf8;
+}
+
 .bg-grid-pattern {
-  background-color: #08090d;
+  background-color: #060911;
 }
 
 .bg-glow-radial {
   background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15) 0%, rgba(16, 185, 129, 0.05) 40%, transparent 70%);
 }
 
-/* Custom Scrollbars for File Lists & Sidebars */
+html, body {
+  cursor: default;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button, a, [role="button"], .cursor-pointer {
+  cursor: pointer !important;
+}
+
+canvas {
+  touch-action: pan-x pan-y;
+}
+
+/* Custom Visible Overlay Scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0d0e15;
-  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.4);
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2a2f45;
-  border-radius: 8px;
+  background: #173e76;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #6366f1;
+  background: #2358a0;
 }

@@ -43,7 +43,7 @@ class RagService:
                 sources=sources
             )
 
-        # 4. Fallback mode
+        # 4. Fallback mode / General AI mode
         fallback_answer = self.generation_service.answer_from_general_knowledge(message)
         return ChatResponse(
             mode="fallback",

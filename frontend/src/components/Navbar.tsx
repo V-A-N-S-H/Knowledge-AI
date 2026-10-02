@@ -33,7 +33,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div
           className={`relative flex h-10 w-10 items-center justify-center rounded-xl border shadow-sm ${
             isLight
-              ? 'border-blue-200 bg-blue-50 text-blue-600'
+              ? 'border-[#173e76]/30 bg-[#173e76]/10 text-[#173e76]'
               : 'border-[#2c375c] bg-[#1a2138] text-indigo-400'
           }`}
         >
@@ -43,12 +43,12 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div>
           <div className="flex items-center gap-2">
             <h1 className={`text-lg font-extrabold tracking-tight leading-none ${isLight ? 'text-slate-900' : 'text-white'}`}>
-              Knowledge<span className="text-blue-600 dark:text-indigo-400 font-extrabold">AI</span>
+              Knowledge<span className="text-[#173e76] dark:text-[#5a8cd8] font-extrabold">AI</span>
             </h1>
             <span
               className={`rounded-full border px-2.5 py-0.5 text-xs font-mono font-bold tracking-wider ${
                 isLight
-                  ? 'border-blue-200 bg-blue-50 text-blue-700'
+                  ? 'border-[#173e76]/30 bg-[#173e76]/10 text-[#173e76]'
                   : 'border-[#263150] bg-[#161c2e] text-indigo-300'
               }`}
             >
@@ -71,7 +71,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               : 'border-slate-800 bg-[#0d0f17] text-slate-300'
           }`}
         >
-          <FileText className="h-4 w-4 text-blue-600 dark:text-indigo-400" />
+          <FileText className="h-4 w-4 text-[#173e76] dark:text-[#5a8cd8]" />
           <span>
             <strong className={isLight ? 'text-slate-900 font-bold' : 'text-white font-bold'}>
               {selectedCount}

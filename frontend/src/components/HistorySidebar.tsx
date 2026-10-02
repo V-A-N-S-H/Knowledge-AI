@@ -75,7 +75,7 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = ({
         <button
           type="button"
           onClick={onNewChat}
-          className="flex items-center justify-center gap-2 rounded-xl bg-[#4f6ef7] hover:bg-[#4360e6] px-4 py-3 text-sm font-extrabold text-white transition-all shadow-md w-full"
+          className="flex items-center justify-center gap-2 rounded-xl bg-[#173e76] hover:bg-[#12315e] px-4 py-3 text-sm font-extrabold text-white transition-all shadow-md w-full"
         >
           <Plus className="h-4 w-4" />
           <span>New Chat</span>

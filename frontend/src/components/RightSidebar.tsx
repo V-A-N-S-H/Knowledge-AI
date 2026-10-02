@@ -22,7 +22,7 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({
     if (ext === 'pdf') return <FileText className="h-4 w-4 text-rose-400" />;
     if (['mp4', 'mov', 'avi', 'mkv'].includes(ext || '')) return <Video className="h-4 w-4 text-purple-400" />;
     if (['png', 'jpg', 'jpeg', 'svg', 'webp'].includes(ext || '')) return <ImageIcon className="h-4 w-4 text-emerald-400" />;
-    return <FileCode className="h-4 w-4 text-blue-400" />;
+    return <FileCode className="h-4 w-4 text-[#173e76]" />;
   };
 
   const getFileBadgeBg = (filename: string) => {
@@ -30,7 +30,7 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({
     if (ext === 'pdf') return 'bg-rose-950/70 border-rose-500/30';
     if (['mp4', 'mov'].includes(ext || '')) return 'bg-purple-950/70 border-purple-500/30';
     if (['png', 'jpg'].includes(ext || '')) return 'bg-emerald-950/70 border-emerald-500/30';
-    return 'bg-blue-950/70 border-blue-500/30';
+    return 'bg-[#173e76]/20 border-[#173e76]/40';
   };
 
   return (

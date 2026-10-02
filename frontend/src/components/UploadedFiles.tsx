@@ -64,7 +64,7 @@ export const UploadedFiles: React.FC<UploadedFilesProps> = ({
                 className={`group flex items-center justify-between gap-3 rounded-2xl border p-3.5 transition-all shadow-2xs ${
                   isSelected
                     ? isLight
-                      ? 'border-indigo-200 bg-gradient-to-r from-indigo-50/80 via-white to-blue-50/40 text-slate-900 shadow-sm'
+                      ? 'border-indigo-200 bg-gradient-to-r from-indigo-50/80 via-white to-[#173e76]/10 text-slate-900 shadow-sm'
                       : 'border-indigo-500/50 bg-[#14192b] text-white shadow-sm'
                     : isLight
                     ? 'border-slate-200/80 bg-slate-50/80 text-slate-800 hover:border-indigo-200 hover:bg-white'
@@ -102,8 +102,8 @@ export const UploadedFiles: React.FC<UploadedFilesProps> = ({
                           ? 'border-purple-200/80 bg-purple-50 text-purple-600'
                           : 'border-purple-500/30 bg-purple-500/20 text-purple-400'
                         : isLight
-                        ? 'border-blue-200/80 bg-blue-50 text-blue-600'
-                        : 'border-blue-500/30 bg-blue-500/20 text-blue-400'
+                        ? 'border-[#173e76]/30 bg-[#173e76]/10 text-[#173e76]'
+                        : 'border-[#173e76]/40 bg-[#173e76]/20 text-[#173e76]'
                     }`}
                   >
                     {isPdf ? (

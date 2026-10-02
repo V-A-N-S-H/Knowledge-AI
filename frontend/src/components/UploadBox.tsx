@@ -81,7 +81,7 @@ export const UploadBox: React.FC<UploadBoxProps> = ({ onDocumentUploaded, theme 
     { label: 'PDF', icon: FileText, color: isLight ? 'text-[#d9534f] bg-[#e8a3a3]/30 border-[#f5c6cb]' : 'text-rose-400 bg-rose-950/40 border-rose-500/30', accept: '.pdf' },
     { label: 'Images', icon: ImageIcon, color: isLight ? 'text-[#2e8b57] bg-[#86c59d]/30 border-[#a3e4be]' : 'text-emerald-400 bg-emerald-950/40 border-emerald-500/30', accept: 'image/*' },
     { label: 'Videos', icon: Video, color: isLight ? 'text-[#8a2be2] bg-[#b195d9]/30 border-[#d6c7f2]' : 'text-purple-400 bg-purple-950/40 border-purple-500/30', accept: 'video/*' },
-    { label: 'Notes', icon: BookOpen, color: isLight ? 'text-[#2b6cb0] bg-[#8cb7e4]/30 border-[#b2d3f5]' : 'text-blue-400 bg-blue-950/40 border-blue-500/30', accept: '.docx,.doc,.txt' },
+    { label: 'Notes', icon: BookOpen, color: isLight ? 'text-[#173e76] bg-[#173e76]/10 border-[#173e76]/30' : 'text-[#173e76] bg-[#173e76]/20 border-[#173e76]/40', accept: '.docx,.doc,.txt' },
     { label: 'Others', icon: FileCode, color: isLight ? 'text-white bg-[#151928] border-slate-800' : 'text-slate-300 bg-slate-900 border-slate-700', accept: '*' },
   ];
 
