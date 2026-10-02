@@ -81,13 +81,17 @@ export function StudyMateSidebar({
       >
         <div onClick={onNewChat} className="flex items-center gap-3 cursor-pointer group">
           <div
-            className={`h-11 w-11 rounded-2xl border flex items-center justify-center shadow-sm transition-all group-hover:scale-105 ${
+            className={`h-11 w-11 rounded-2xl border flex items-center justify-center shadow-sm p-1.5 transition-all group-hover:scale-105 ${
               isLight
-                ? 'bg-[#173e76]/10 border-[#173e76]/20 text-[#173e76]'
-                : 'bg-[#173e76]/25 border-[#173e76]/40 text-[#5a8cd8]'
+                ? 'bg-[#173e76]/10 border-[#173e76]/20'
+                : 'bg-[#173e76]/25 border-[#173e76]/40'
             }`}
           >
-            {/* <BookOpen className="h-6 w-6 stroke-[2.3]" /> */}
+            <img
+              src={isLight ? '/logo-k.png' : '/logo-k-dark.png'}
+              alt="KnowledgeAI Logo"
+              className="h-7 w-7 object-contain"
+            />
           </div>
           <span
             className={`font-black text-xl tracking-tight font-sans ${
