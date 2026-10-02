@@ -29,21 +29,12 @@ export const Navbar: React.FC<NavbarProps> = ({
       }`}
     >
       {/* Brand & Logo */}
-      <div className="flex items-center gap-3.5">
-        <div
-          className={`relative flex h-10 w-10 items-center justify-center rounded-xl border shadow-sm p-1 transition-all ${
-            isLight
-              ? 'border-[#173e76]/30 bg-[#173e76]/10'
-              : 'border-[#173e76]/40 bg-[#173e76]/25'
-          }`}
-        >
-          <img
-            src={isLight ? '/logo-k.png' : '/logo-k-dark.png'}
-            alt="KnowledgeAI Logo"
-            className="h-6 w-6 object-contain"
-          />
-          <span className="absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-[#08090d]" />
-        </div>
+      <div className="flex items-center gap-3">
+        <img
+          src={isLight ? '/logo-k.png' : '/logo-k-dark.png'}
+          alt="KnowledgeAI Logo"
+          className="h-8 w-8 object-contain transition-transform hover:scale-105 cursor-pointer"
+        />
         <div>
           <div className="flex items-center gap-2">
             <h1 className={`text-lg font-extrabold tracking-tight leading-none ${isLight ? 'text-slate-900' : 'text-white'}`}>

@@ -169,9 +169,9 @@ export function StudyMateLandingView({
       }`}
     >
       {/* 1. Hero Headline Banner (OpenAI Style Minimalist Typography) */}
-      <div className="text-center space-y-3 pt-4 sm:pt-6 max-w-3xl mx-auto">
+      <div className="text-center space-y-3 pt-4 sm:pt-6 max-w-4xl mx-auto px-2">
         <h1
-          className={`text-4xl sm:text-5xl font-semibold tracking-tight font-sans leading-tight min-h-[3.5rem] ${
+          className={`text-2xl sm:text-3xl md:text-4xl lg:text-[2.65rem] font-semibold tracking-tight font-sans leading-tight min-h-[3.5rem] whitespace-nowrap overflow-hidden text-ellipsis ${
             isLight ? 'text-slate-900' : 'text-white'
           }`}
         >
