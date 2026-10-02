@@ -20,8 +20,10 @@ class RetrievalService:
         self,
         question: str,
         document_ids: list[str],
-        limit: int = 5
+        limit: int = 5,
+        user_id: str | None = None
     ) -> list[RetrievedChunk]:
+        target_owner = user_id or self.owner_id
         stripped = question.strip()
         if not stripped:
             raise AppError(status_code=400, public_message="Question message cannot be empty.")
@@ -32,7 +34,7 @@ class RetrievalService:
         query_vector = self.embedding_service.embed_query(stripped)
         return self.vector_store.search(
             query_vector=query_vector,
-            user_id=self.owner_id,
+            user_id=target_owner,
             document_ids=document_ids,
             limit=limit
         )

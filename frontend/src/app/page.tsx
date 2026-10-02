@@ -347,6 +347,7 @@ export default function Home() {
               pendingQuickPrompt={pendingQuickPrompt}
               onClearQuickPrompt={() => setPendingQuickPrompt(null)}
               theme={theme}
+              userId={userId}
             />
           )}
         </div>

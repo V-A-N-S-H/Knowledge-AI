@@ -12,11 +12,15 @@ session_registry = ChatSessionRegistry()
 @router.post("", response_model=ChatResponse)
 def chat_answer(
     request: ChatRequest,
+    x_user_id: str | None = Header(default=None, alias="X-User-Id"),
+    user_id: str | None = Query(default=None),
     rag_service: RagService = Depends(get_rag_service)
 ) -> ChatResponse:
+    target_user_id = x_user_id or user_id or "dev_user_001"
     return rag_service.answer(
         message=request.message,
-        document_ids=request.document_ids
+        document_ids=request.document_ids,
+        user_id=target_user_id
     )
 
 

@@ -34,6 +34,7 @@ interface StudyMateDocumentWorkspaceProps {
   pendingQuickPrompt?: string | null;
   onClearQuickPrompt?: () => void;
   theme?: 'dark' | 'light';
+  userId?: string;
 }
 
 export function StudyMateDocumentWorkspace({
@@ -47,6 +48,7 @@ export function StudyMateDocumentWorkspace({
   pendingQuickPrompt,
   onClearQuickPrompt,
   theme = 'dark',
+  userId,
 }: StudyMateDocumentWorkspaceProps) {
   const isLight = theme === 'light';
   const [input, setInput] = useState('');
@@ -121,7 +123,7 @@ export function StudyMateDocumentWorkspace({
 
     try {
       const docIds = (documentId === 'global' || !docFileUrl) ? [] : [documentId];
-      const response = await sendChatMessage(query, docIds);
+      const response = await sendChatMessage(query, docIds, userId);
 
       const assistantMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),

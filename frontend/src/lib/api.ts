@@ -160,13 +160,16 @@ export async function uploadDocument(file: File, userId?: string): Promise<Uploa
 
 export async function sendChatMessage(
   message: string,
-  documentIds: string[] = []
+  documentIds: string[] = [],
+  userId?: string
 ): Promise<ChatResponse> {
+  const headers = {
+    'Content-Type': 'application/json',
+    ...getAuthHeaders(userId),
+  };
   const res = await fetch(`${API_BASE_URL}/chat`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers,
     body: JSON.stringify({
       message,
       document_ids: documentIds,

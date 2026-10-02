@@ -16,9 +16,9 @@ class RagService:
         self.answerability_service = answerability_service
         self.generation_service = generation_service
 
-    def answer(self, message: str, document_ids: list[str]) -> ChatResponse:
+    def answer(self, message: str, document_ids: list[str], user_id: str | None = None) -> ChatResponse:
         # 1. Retrieve candidate evidence chunks
-        evidence = self.retrieval_service.retrieve(message, document_ids)
+        evidence = self.retrieval_service.retrieve(message, document_ids, user_id=user_id)
 
         # 2. Perform evidence answerability check
         is_supported = self.answerability_service.is_supported(message, evidence)
